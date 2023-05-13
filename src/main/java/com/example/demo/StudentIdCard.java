@@ -15,7 +15,7 @@ public class StudentIdCard  {
     @Column(name = "card_number", nullable = false, columnDefinition = "TEXT", length = 50)
     private String cardNumber;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "student_id", referencedColumnName = "id", nullable = false, foreignKey = @ForeignKey(name = "student_id_card_student_id_fk"))
     private Student student;
 
@@ -39,6 +39,9 @@ public class StudentIdCard  {
     public StudentIdCard(String cardNumber, Student student) {
         this.cardNumber = cardNumber;
         this.student = student;
+    }
+
+    public StudentIdCard() {
     }
 
 

@@ -7,13 +7,12 @@ import javax.persistence.*;
         @UniqueConstraint(name = "students_email_unique", columnNames = "email")
 })
 public class Student {
-
     @Id
     @SequenceGenerator(name = "students_sequence", sequenceName = "students_sequence", allocationSize = 1, initialValue = 1, schema = "public")
     @GeneratedValue(strategy = javax.persistence.GenerationType.SEQUENCE, generator = "students_sequence")
     @Column(name = "id", updatable = false, nullable = false)
     private Long id;
-     @Column(name = "first_name", nullable = false, columnDefinition = "TEXT", length = 50)
+    @Column(name = "first_name", nullable = false, columnDefinition = "TEXT", length = 50)
     private String firstName;
     @Column(name = "last_name", nullable = false, columnDefinition = "TEXT", length = 50)
     private String lastName;
@@ -21,7 +20,10 @@ public class Student {
     private String email;
     @Column(name = "age", nullable = false, columnDefinition = "INTEGER", length = 3)
     private Integer age;
-
+    @OneToOne(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
+    private StudentIdCard studentIdCard;
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY, orphanRemoval = true)
+    private java.util.List<Book> books = new java.util.ArrayList<>();
 
     public Student(String firstName, String lastName, String email, Integer age) {
         this.firstName = firstName;
@@ -73,7 +75,27 @@ public class Student {
     public Student() {
     }
 
+    public void addBook(Book book) {
+        if (!this.books.contains(book)) {
+            this.books.add(book);
+            book.setStudent(this);
+        }
+    }
 
+    public void removeBook(Book book) {
+        if (this.books.contains(book)) {
+            this.books.remove(book);
+            book.setStudent(null);
+        }
+    }
+
+    public void setStudentIdCard(StudentIdCard studentIdCard) {
+        this.studentIdCard = studentIdCard;
+    }
+
+    public StudentIdCard getStudentIdCard() {
+        return studentIdCard;
+    }
 
     @Override
     public String toString() {
