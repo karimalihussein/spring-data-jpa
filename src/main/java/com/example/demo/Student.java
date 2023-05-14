@@ -1,7 +1,8 @@
 package com.example.demo;
 
 import javax.persistence.*;
-
+import java.util.List;
+import java.util.ArrayList;
 @Entity(name = "students")
 @Table(name = "students", schema = "public", uniqueConstraints = {
         @UniqueConstraint(name = "students_email_unique", columnNames = "email")
@@ -25,27 +26,23 @@ public class Student {
     @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY, orphanRemoval = true)
     private java.util.List<Book> books = new java.util.ArrayList<>();
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY)
-    @JoinTable(name = "enrolments", schema = "public",
-            joinColumns = @JoinColumn(name = "student_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "enrolments_student_id_fk")),
-            inverseJoinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "enrolments_course_id_fk")))
-    private java.util.List<Course> courses = new java.util.ArrayList<>();
+    @OneToMany(mappedBy = "student", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY, orphanRemoval = true)
+    private java.util.List<Enrolment> enrolments = new java.util.ArrayList<>();
 
 
-    public java.util.List<Book> getBooks() {
-        return books;
-    }
 
     public void setBooks(java.util.List<Book> books) {
         this.books = books;
     }
-
 
     public Student(String firstName, String lastName, String email, Integer age) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.age = age;
+    }
+
+    public Student() {
     }
 
     public Long getId() {
@@ -88,8 +85,7 @@ public class Student {
         this.age = age;
     }
 
-    public Student() {
-    }
+
 
     public void addBook(Book book) {
         if (!this.books.contains(book)) {
@@ -113,17 +109,23 @@ public class Student {
         return studentIdCard;
     }
 
-    public void enrollToCourse(Course course) {
-        if (!this.courses.contains(course)) {
-            this.courses.add(course);
-            course.getStudents().add(this);
+    public List<Enrolment> getEnrolments() {
+        return enrolments;
+    }
+
+    public void addEnrolment(Enrolment enrolment) {
+        if (!enrolments.contains(enrolment)) {
+            enrolments.add(enrolment);
         }
     }
-    public void unEnrollFromCourse(Course course) {
-            if (this.courses.contains(course)) {
-                this.courses.remove(course);
-                course.getStudents().remove(this);
-            }
+
+    public void removeEnrolment(Enrolment enrolment) {
+        if (enrolments.contains(enrolment)) {
+            enrolments.remove(enrolment);
+        }
+    }
+    public List<Book> getBooks() {
+        return books;
     }
 
     @Override

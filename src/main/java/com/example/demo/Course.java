@@ -1,10 +1,11 @@
 package com.example.demo;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "courses", schema = "public", uniqueConstraints = {
-        @UniqueConstraint(name = "course_name_unique", columnNames = "name")
+        @UniqueConstraint(name = "courses_name_department_unique", columnNames = {"name", "department"})
 })
 public class Course {
 
@@ -18,8 +19,8 @@ public class Course {
     @Column(name = "department", nullable = false, columnDefinition = "TEXT", length = 50)
     private String department;
 
-    @ManyToMany(mappedBy = "courses")
-    private java.util.List<Student> students = new java.util.ArrayList<>();
+    @OneToMany(mappedBy = "course", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.LAZY, orphanRemoval = true)
+    private java.util.List<Enrolment> enrolments = new java.util.ArrayList<>();
 
 
 
@@ -57,8 +58,21 @@ public class Course {
         this.department = department;
     }
 
-    public java.util.List<Student> getStudents() {
-        return students;
+
+    public List<Enrolment> getEnrolments() {
+        return enrolments;
+    }
+
+    public void addEnrolment(Enrolment enrolment) {
+        if (!enrolments.contains(enrolment)) {
+            enrolments.add(enrolment);
+        }
+    }
+
+    public void removeEnrolment(Enrolment enrolment) {
+        if (enrolments.contains(enrolment)) {
+            enrolments.remove(enrolment);
+        }
     }
 
     @Override
